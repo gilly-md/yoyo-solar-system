@@ -229,6 +229,30 @@
   .big-action-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 4px; }
   .big-action-desc { font-size: 0.85rem; opacity: 0.8; line-height: 1.4; }
 
+  /* Credit line on start screen */
+  .credit {
+    text-align: center;
+    margin-top: 24px;
+    padding: 14px 20px;
+    font-size: 0.85rem;
+    color: var(--soft-purple);
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+    animation: creditFade 3s ease-in-out infinite;
+  }
+  .credit span {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(183, 148, 244, 0.08);
+    border: 1px solid rgba(183, 148, 244, 0.2);
+    border-radius: 50px;
+    backdrop-filter: blur(5px);
+  }
+  @keyframes creditFade {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
   /* Lobby - room code display */
   .room-code-display {
     text-align: center;
@@ -868,6 +892,9 @@
         <div class="big-action-title">הצטרף למשחק</div>
         <div class="big-action-desc">יש לך כבר קוד חדר? הקלד אותו</div>
       </button>
+    </div>
+    <div class="credit">
+      <span>✨ נבנה על ידי יונתן פלד ✨</span>
     </div>
   </div>
 
