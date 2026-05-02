@@ -1145,6 +1145,7 @@ const questions = [
 // ===== Constants =====
 const QUESTION_TIME = 30;
 const REVEAL_TIME = 6;
+const FINAL_REVEAL_TIME = 3;
 const TIMER_CIRCUMFERENCE = 163.36;
 const ROOM_CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ";
 
@@ -1754,6 +1755,12 @@ function renderReveal() {
   $('rCorrectText').textContent = q.options[q.correct];
   $('rExplanation').textContent = q.explanation;
 
+  // Update countdown text - different for the last question
+  const isLastQuestion = qIdx >= questions.length - 1;
+  $('rCountdownText').textContent = isLastQuestion
+    ? '🏆 תוצאות סופיות בעוד'
+    : 'השאלה הבאה בעוד';
+
   // Live leaderboard
   renderLiveLeaderboard();
 }
@@ -1787,6 +1794,8 @@ function renderLiveLeaderboard() {
 function startRevealCountdown() {
   if (revealCountdownInterval) clearInterval(revealCountdownInterval);
   const startTime = roomData.revealStartTime || Date.now();
+  const isLastQuestion = roomData.currentQuestion >= questions.length - 1;
+  const targetTime = isLastQuestion ? FINAL_REVEAL_TIME : REVEAL_TIME;
   const tick = () => {
     if (!roomData || roomData.state !== 'reveal') {
       clearInterval(revealCountdownInterval);
@@ -1794,7 +1803,7 @@ function startRevealCountdown() {
       return;
     }
     const elapsed = (Date.now() - startTime) / 1000;
-    const remaining = Math.max(0, REVEAL_TIME - elapsed);
+    const remaining = Math.max(0, targetTime - elapsed);
     $('rCountdown').textContent = Math.ceil(remaining);
     if (remaining <= 0) {
       clearInterval(revealCountdownInterval);
