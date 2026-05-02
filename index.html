@@ -840,13 +840,13 @@
       </div>
       <p style="margin-bottom: 12px;">קצרה ההסבר:</p>
       <ol class="setup-steps">
-        <li>היכנסי ל-<a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
-        <li>צרי פרויקט חדש (חינם)</li>
-        <li>הוסיפי אפליקציית Web</li>
+        <li>היכנס ל-<a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
+        <li>צור פרויקט חדש (חינם)</li>
+        <li>הוסף אפליקציית Web</li>
         <li>הפעילי "Realtime Database" במצב Test</li>
-        <li>העתיקי את הקוד <code>firebaseConfig</code> והחליפי בקובץ HTML</li>
+        <li>העתק את הקוד <code>firebaseConfig</code> והחלף בקובץ HTML</li>
       </ol>
-      <p style="margin-top: 14px; font-size: 0.85rem; color: var(--soft-purple);">📖 הוראות מלאות צעד-צעד תקבלי מההודעה ש-Claude שלח</p>
+      <p style="margin-top: 14px; font-size: 0.85rem; color: var(--soft-purple);">📖 הוראות מלאות צעד-צעד תקבל מההודעה ש-Claude שלח</p>
     </div>
   </div>
 
@@ -860,13 +860,13 @@
     <div class="card">
       <button class="big-action-btn create" id="btnCreateRoom">
         <div class="big-action-icon">🎮</div>
-        <div class="big-action-title">צרי משחק חדש</div>
-        <div class="big-action-desc">תקבלי קוד חדר לשתף עם הכיתה</div>
+        <div class="big-action-title">צור משחק חדש</div>
+        <div class="big-action-desc">תקבל קוד חדר לשתף עם הכיתה</div>
       </button>
       <button class="big-action-btn join" id="btnJoinRoom">
         <div class="big-action-icon">🚪</div>
-        <div class="big-action-title">הצטרפי למשחק</div>
-        <div class="big-action-desc">יש לך כבר קוד חדר? הקלידי אותו</div>
+        <div class="big-action-title">הצטרף למשחק</div>
+        <div class="big-action-desc">יש לך כבר קוד חדר? הקלד אותו</div>
       </button>
     </div>
   </div>
@@ -880,9 +880,9 @@
     </div>
     <div class="card">
       <label class="input-label" for="createNameInput">השם שלך:</label>
-      <input class="input" id="createNameInput" type="text" placeholder="הקלידי את שמך..." maxlength="20" autocomplete="off">
+      <input class="input" id="createNameInput" type="text" placeholder="הקלד את שמך..." maxlength="20" autocomplete="off">
       <div class="form-error" id="createError"></div>
-      <button class="btn btn-primary" id="btnConfirmCreate">צרי משחק 🚀</button>
+      <button class="btn btn-primary" id="btnConfirmCreate">צור משחק 🚀</button>
       <button class="btn btn-ghost" data-back="start">→ חזרה</button>
     </div>
   </div>
@@ -891,7 +891,7 @@
   <div class="screen" id="screen-join">
     <div class="header">
       <span class="badge">🚪 מצטרפים למשחק</span>
-      <h1 class="title">הקלידי את הקוד</h1>
+      <h1 class="title">הקלד את הקוד</h1>
       <p class="subtitle">הקוד הוא 4 אותיות וקיבלת אותו מהמורה/חבר</p>
     </div>
     <div class="card">
@@ -899,10 +899,10 @@
       <input class="input input-code" id="joinCodeInput" type="text" placeholder="ABCD" maxlength="4" autocomplete="off" inputmode="text">
 
       <label class="input-label" for="joinNameInput" style="margin-top: 16px;">השם שלך:</label>
-      <input class="input" id="joinNameInput" type="text" placeholder="הקלידי את שמך..." maxlength="20" autocomplete="off">
+      <input class="input" id="joinNameInput" type="text" placeholder="הקלד את שמך..." maxlength="20" autocomplete="off">
 
       <div class="form-error" id="joinError"></div>
-      <button class="btn btn-primary" id="btnConfirmJoin">הצטרפי 🎯</button>
+      <button class="btn btn-primary" id="btnConfirmJoin">הצטרף 🎯</button>
       <button class="btn btn-ghost" data-back="start">→ חזרה</button>
     </div>
   </div>
@@ -913,7 +913,7 @@
       <div class="room-code-display">
         <div class="room-code-label">קוד החדר</div>
         <div class="room-code-value" id="lobbyCode">----</div>
-        <div class="room-code-hint">שתפי את הקוד הזה עם הכיתה</div>
+        <div class="room-code-hint">שתף את הקוד הזה עם הכיתה</div>
       </div>
       <div class="share-section">
         <div class="share-label">📋 קישור לשיתוף בוואטסאפ:</div>
@@ -921,7 +921,7 @@
           <input class="share-link-input" id="shareLinkInput" readonly>
           <button class="btn-copy" id="btnCopyLink">📋 העתק</button>
         </div>
-        <button class="btn btn-secondary" id="btnShareNative" style="margin-top: 10px; display: none;">📤 שתפי דרך אפליקציה</button>
+        <button class="btn btn-secondary" id="btnShareNative" style="margin-top: 10px; display: none;">📤 שתף דרך אפליקציה</button>
       </div>
     </div>
 
@@ -937,14 +937,14 @@
       </div>
 
       <div id="hostControls" style="display: none;">
-        <button class="btn btn-primary" id="btnStartGame">התחילי את המשחק! 🚀</button>
+        <button class="btn btn-primary" id="btnStartGame">התחל את המשחק! 🚀</button>
       </div>
       <div id="guestWaiting" class="waiting-msg">
-        ⏳ מחכים ש<span id="waitingHostName">המורה</span> תתחיל<span class="waiting-dots"></span>
+        ⏳ מחכים שהמשחק יתחיל<span class="waiting-dots"></span>
       </div>
     </div>
 
-    <button class="btn btn-ghost" id="btnLeaveLobby">→ צאי מהחדר</button>
+    <button class="btn btn-ghost" id="btnLeaveLobby">→ צא מהחדר</button>
   </div>
 
   <!-- ===== Question Screen ===== -->
@@ -1024,18 +1024,18 @@
 
     <!-- Video intro - shown first -->
     <div class="card video-card" id="videoCard">
-      <div class="video-suspense">🥁 והמנצח/ת הוא/היא...</div>
+      <div class="video-suspense">🥁 והמנצח הוא...</div>
       <div class="video-wrap">
         <video id="winnerVideo" playsinline preload="auto" muted>
           <source src="winner-video.mp4" type="video/mp4">
         </video>
       </div>
-      <button class="btn-skip-video" id="btnSkipVideo">דלגי על הסרטון ←</button>
+      <button class="btn-skip-video" id="btnSkipVideo">דלג על הסרטון ←</button>
     </div>
 
     <!-- Winner reveal - hidden until video ends -->
     <div class="card winner-reveal-card" id="winnerRevealCard" style="display:none;">
-      <div class="winner-prefix">🏆 והמנצח/ת הוא/היא 🏆</div>
+      <div class="winner-prefix">🏆 והמנצח הוא 🏆</div>
       <div class="winner-name-big" id="winnerNameBig">...</div>
       <div class="winner-score-big"><span id="winnerScoreBig">0</span> נקודות</div>
     </div>
@@ -1267,7 +1267,7 @@ async function handleCreate() {
   const name = $('createNameInput').value.trim();
   const errorEl = $('createError');
 
-  if (!name) { errorEl.textContent = 'אנא הקלידי את שמך'; return; }
+  if (!name) { errorEl.textContent = 'אנא הקלד את שמך'; return; }
   if (name.length < 2) { errorEl.textContent = 'השם קצר מדי'; return; }
   errorEl.textContent = '';
 
@@ -1308,7 +1308,7 @@ async function handleCreate() {
     console.error(e);
     errorEl.textContent = 'שגיאה ביצירת המשחק. נסי שוב.';
     $('btnConfirmCreate').disabled = false;
-    $('btnConfirmCreate').textContent = 'צרי משחק 🚀';
+    $('btnConfirmCreate').textContent = 'צור משחק 🚀';
   }
 }
 
@@ -1319,7 +1319,7 @@ async function handleJoin() {
   const errorEl = $('joinError');
 
   if (!code || code.length !== 4) { errorEl.textContent = 'הקוד חייב להיות 4 אותיות'; return; }
-  if (!name) { errorEl.textContent = 'אנא הקלידי את שמך'; return; }
+  if (!name) { errorEl.textContent = 'אנא הקלד את שמך'; return; }
   if (name.length < 2) { errorEl.textContent = 'השם קצר מדי'; return; }
   errorEl.textContent = '';
 
@@ -1332,14 +1332,14 @@ async function handleJoin() {
     if (!snap.exists()) {
       errorEl.textContent = 'קוד לא נכון - לא נמצא חדר כזה';
       $('btnConfirmJoin').disabled = false;
-      $('btnConfirmJoin').textContent = 'הצטרפי 🎯';
+      $('btnConfirmJoin').textContent = 'הצטרף 🎯';
       return;
     }
     const data = snap.val();
     if (data.state !== 'lobby') {
       errorEl.textContent = 'המשחק כבר התחיל - לא ניתן להצטרף עכשיו';
       $('btnConfirmJoin').disabled = false;
-      $('btnConfirmJoin').textContent = 'הצטרפי 🎯';
+      $('btnConfirmJoin').textContent = 'הצטרף 🎯';
       return;
     }
 
@@ -1356,9 +1356,9 @@ async function handleJoin() {
     listenToRoom(code);
   } catch (e) {
     console.error(e);
-    errorEl.textContent = 'שגיאה. בדקי את החיבור לאינטרנט.';
+    errorEl.textContent = 'שגיאה. בדוק את החיבור לאינטרנט.';
     $('btnConfirmJoin').disabled = false;
-    $('btnConfirmJoin').textContent = 'הצטרפי 🎯';
+    $('btnConfirmJoin').textContent = 'הצטרף 🎯';
   }
 }
 
@@ -1392,9 +1392,9 @@ function cleanupAndExit(msg) {
 
   // Reset buttons
   $('btnConfirmCreate').disabled = false;
-  $('btnConfirmCreate').textContent = 'צרי משחק 🚀';
+  $('btnConfirmCreate').textContent = 'צור משחק 🚀';
   $('btnConfirmJoin').disabled = false;
-  $('btnConfirmJoin').textContent = 'הצטרפי 🎯';
+  $('btnConfirmJoin').textContent = 'הצטרף 🎯';
 }
 
 // ===== Handle room state changes =====
@@ -1461,7 +1461,7 @@ function renderLobby() {
       if (isHostPlayer) cls += ' host';
       else if (isYou) cls += ' you';
       const icon = isHostPlayer ? '👑 ' : (isYou ? '⭐ ' : '');
-      const tag = isYou && !isHostPlayer ? ' (את/ה)' : '';
+      const tag = isYou && !isHostPlayer ? ' (אתה)' : '';
       return `<div class="${cls}">${icon}${escapeHtml(p.name)}${tag}</div>`;
     }).join('');
   }
@@ -1473,7 +1473,6 @@ function renderLobby() {
   } else {
     $('hostControls').style.display = 'none';
     $('guestWaiting').style.display = 'block';
-    $('waitingHostName').textContent = roomData.hostName || 'המורה';
   }
 }
 
@@ -1511,7 +1510,7 @@ async function copyShareLink() {
     // Last resort: select text so user can manually copy
     input.focus();
     input.select();
-    alert('בחרי את הקישור והעתיקי עם Ctrl+C (במק: Cmd+C)');
+    alert('בחר את הקישור והעתק עם Ctrl+C (במק: Cmd+C)');
   }
 }
 
@@ -1784,7 +1783,7 @@ function renderLiveLeaderboard() {
     return `
       <div class="${cls}">
         <div class="live-lb-rank">${medal}</div>
-        <div class="live-lb-name">${escapeHtml(p.name)}${p.id === myId ? ' (את/ה)' : ''}</div>
+        <div class="live-lb-name">${escapeHtml(p.name)}${p.id === myId ? ' (אתה)' : ''}</div>
         <div class="live-lb-score">${(p.score || 0).toLocaleString()}</div>
       </div>
     `;
@@ -1887,7 +1886,7 @@ function renderFinished() {
         <div class="lb-rank-emoji">${medals[i]}</div>
         <div class="lb-name">
           ${escapeHtml(p.name)}
-          ${p.id === myId ? '<span class="lb-you-tag">את/ה!</span>' : ''}
+          ${p.id === myId ? '<span class="lb-you-tag">אתה!</span>' : ''}
         </div>
         <div class="lb-score">${(p.score || 0).toLocaleString()}</div>
       </div>
