@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#050217">
+  <title>חידון מערכת השמש - משחק חי 🚀</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Bellefair&family=JetBrains+Mono:wght@700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --deep-space: #050217;
+      --nebula-purple: #1a0b3d;
+      --cosmic-blue: #0a1f4d;
+      --star-gold: #ffd700;
+      --plasma-pink: #ff3e9d;
+      --neon-cyan: #00f5ff;
+      --ghost-white: #f0f4ff;
+      --success-green: #00ff9d;
+      --danger-red: #ff4d6d;
+      --soft-purple: #b794f4;
+      --warning-orange: #ffa500;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    html,
+    body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: var(--deep-space);
+      color: var(--ghost-white);
+      min-height: 100vh;
+      min-height: 100dvh;
+      direction: rtl;
+      -webkit-font-smoothing: antialiased;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    /* Background */
+    .stars-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .stars-layer::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background-image:
+        radial-gradient(1.5px 1.5px at 20px 30px, white, transparent),
+        radial-gradient(1px 1px at 40px 70px, white, transparent),
+        radial-gradient(1.5px 1.5px at 90px 40px, var(--star-gold), transparent),
+        radial-gradient(1px 1px at 130px 80px, white, transparent),
+        radial-gradient(1.5px 1.5px at 160px 120px, var(--neon-cyan), transparent),
+        radial-gradient(1px 1px at 200px 50px, white, transparent),
+        radial-gradient(1.5px 1.5px at 280px 30px, var(--plasma-pink), transparent),
+        radial-gradient(1px 1px at 320px 90px, white, transparent);
+      background-size: 350px 200px;
+      animation: drift 200s linear infinite;
+    }
+
+    @keyframes drift {
+      to {
+        transform: translate(-350px, -200px);
+      }
+    }
+
+    .nebula {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .nebula-1 {
+      top: -15%;
+      right: -20%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255, 62, 157, 0.3), transparent 70%);
+      animation: pulse 8s ease-in-out infinite;
+    }
+
+    .nebula-2 {
+      bottom: -15%;
+      left: -20%;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(0, 245, 255, 0.2), transparent 70%);
+      animation: pulse 10s ease-in-out infinite reverse;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+
+      50% {
+        transform: scale(1.15);
+        opacity: 1;
+      }
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 16px 14px 24px;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    /* Screens */
+    .screen {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: linear-gradient(135deg, rgba(26, 11, 61, 0.75), rgba(10, 31, 77, 0.65));
+      border: 1px solid rgba(183, 148, 244, 0.3);
+      border-radius: 18px;
+      padding: 22px 18px;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(0, 245, 255, 0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(255, 215, 0, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      border-radius: 50px;
+      font-size: 11px;
+      color: var(--star-gold);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .title {
+      font-family: 'Bellefair', serif;
+      font-size: 1.85rem;
+      font-weight: 400;
+      background: linear-gradient(135deg, #fff 0%, var(--soft-purple) 50%, var(--neon-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: var(--soft-purple);
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* Inputs */
+    .input-label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--ghost-white);
+    }
+
+    .input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(183, 148, 244, 0.4);
+      border-radius: 12px;
+      color: var(--ghost-white);
+      font-family: inherit;
+      font-size: 1.05rem;
+      text-align: right;
+      transition: all 0.25s ease;
+      direction: rtl;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--neon-cyan);
+      background: rgba(0, 245, 255, 0.05);
+      box-shadow: 0 0 20px rgba(0, 245, 255, 0.25);
+    }
+
+    .input::placeholder {
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .input-code {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.6rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      direction: ltr;
+      padding: 18px 16px;
+    }
+
+    .form-error {
+      color: var(--danger-red);
+      font-size: 0.85rem;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      min-height: 50px;
+      -webkit-user-select: none;
+      user-select: none;
+      margin-top: 12px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--plasma-pink), var(--soft-purple));
+      color: white;
+      box-shadow: 0 6px 20px rgba(255, 62, 157, 0.35);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: rgba(0, 245, 255, 0.1);
+      color: var(--neon-cyan);
+      border: 2px solid var(--neon-cyan);
+    }
+
+    .btn-secondary:active:not(:disabled) {
+      background: var(--neon-cyan);
+      color: var(--deep-space);
+      transform: scale(0.98);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--soft-purple);
+      border: 1px solid rgba(183, 148, 244, 0.4);
+      padding: 10px;
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-row .btn {
+      margin-top: 0;
+      flex: 1;
+    }
+
+    /* Start screen big buttons */
+    .big-action-btn {
+      display: block;
+      width: 100%;
+      padding: 22px 20px;
+      border-radius: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--ghost-white);
+      text-align: right;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-bottom: 12px;
+      font-family: inherit;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .big-action-btn:active {
+      transform: scale(0.98);
+    }
+
+    .big-action-btn.create {
+      background: linear-gradient(135deg, rgba(255, 62, 157, 0.2), rgba(183, 148, 244, 0.15));
+      border-color: var(--plasma-pink);
+    }
+
+    .big-action-btn.join {
+      background: linear-gradient(135deg, rgba(0, 245, 255, 0.15), rgba(0, 255, 157, 0.1));
+      border-color: var(--neon-cyan);
+    }
+
+    .big-action-icon {
+      font-size: 2.5rem;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .big-action-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .big-action-desc {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+
+    /* Lobby - room code display */
+    .room-code-display {
+      text-align: center;
+      padding: 18px 0;
+    }
+
+    .room-code-label {
+      font-size: 0.85rem;
+      color: var(--soft-purple);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .room-code-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      background: linear-gradient(135deg, var(--star-gold), var(--plasma-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      direction: ltr;
+      display: inline-block;
+      padding: 0 10px;
+    }
+
+    .room-code-hint {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 8px;
+    }
+
+    /* Player list */
+    .players-section {
+      margin-top: 6px;
+    }
+
+    .players-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .players-title {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .players-count {
+      background: var(--neon-cyan);
+      color: var(--deep-space);
+      padding: 2px 10px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+
+    .players-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+      min-height: 50px;
+    }
+
+    .player-chip {
+      padding: 6px 12px;
+      background: rgba(183, 148, 244, 0.18);
+      border: 1px solid rgba(183, 148, 244, 0.4);
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      animation: chipIn 0.4s ease;
+    }
+
+    .player-chip.host {
+      background: rgba(255, 215, 0, 0.18);
+      border-color: rgba(255, 215, 0, 0.5);
+      color: var(--star-gold);
+    }
+
+    .player-chip.you {
+      background: rgba(0, 245, 255, 0.18);
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+    }
+
+    @keyframes chipIn {
+      from {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .lobby-empty {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+      padding: 16px;
+    }
+
+    .waiting-msg {
+      text-align: center;
+      padding: 16px;
+      color: var(--soft-purple);
+      font-size: 0.95rem;
+    }
+
+    .waiting-dots::after {
+      content: '...';
+      animation: dots 1.4s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+
+      0%,
+      20% {
+        content: '';
+      }
+
+      40% {
+        content: '.';
+      }
+
+      60% {
+        content: '..';
+      }
+
+      80%,
+      100% {
+        content: '...';
+      }
+    }
+
+    /* Quiz header (in question screen) */
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+
+    .player-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(183, 148, 244, 0.15);
+      border: 1px solid rgba(183, 148, 244, 0.3);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      max-width: 60%;
+      overflow: hidden;
+    }
+
+    .player-name-display {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .score-display {
+      color: var(--star-gold);
+      font-weight: 900;
+      font-size: 1rem;
+      padding: 6px 14px;
+      background: rgba(255, 215, 0, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+      color: var(--soft-purple);
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 14px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--plasma-pink), var(--neon-cyan));
+      border-radius: 50px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
+    }
+
+    /* Timer */
+    .timer-container {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 56px;
+      height: 56px;
+    }
+
+    .timer-ring {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .timer-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 4;
+    }
+
+    .timer-progress {
+      fill: none;
+      stroke: var(--success-green);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 163.36;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.95s linear, stroke 0.5s ease;
+      filter: drop-shadow(0 0 4px currentColor);
+    }
+
+    .timer-progress.warning {
+      stroke: var(--warning-orange);
+    }
+
+    .timer-progress.danger {
+      stroke: var(--danger-red);
+    }
+
+    .timer-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 900;
+      font-size: 1.25rem;
+      color: var(--success-green);
+      transition: color 0.5s ease;
+    }
+
+    .timer-text.warning {
+      color: var(--warning-orange);
+    }
+
+    .timer-text.danger {
+      color: var(--danger-red);
+      animation: pulseTimer 0.6s ease-in-out infinite;
+    }
+
+    @keyframes pulseTimer {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.15);
+      }
+    }
+
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.45;
+      margin: 50px 0 18px;
+      padding-right: 4px;
+    }
+
+    .question-number {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--plasma-pink), var(--soft-purple));
+      color: white;
+      padding: 3px 11px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* Options */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .option {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 13px 14px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      color: var(--ghost-white);
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-height: 56px;
+      width: 100%;
+      user-select: none;
+    }
+
+    .option:active:not(:disabled) {
+      transform: scale(0.98);
+      background: rgba(183, 148, 244, 0.18);
+    }
+
+    .option:disabled {
+      cursor: not-allowed;
+    }
+
+    .option-letter {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--neon-cyan);
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      flex: 1;
+      word-wrap: break-word;
+    }
+
+    .option.selected {
+      background: rgba(0, 245, 255, 0.18);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 25px rgba(0, 245, 255, 0.3);
+    }
+
+    .option.selected .option-letter {
+      background: var(--neon-cyan);
+      color: var(--deep-space);
+      border-color: var(--neon-cyan);
+    }
+
+    .answered-status {
+      margin-top: 16px;
+      text-align: center;
+      padding: 12px;
+      background: rgba(0, 255, 157, 0.1);
+      border: 1px solid rgba(0, 255, 157, 0.3);
+      border-radius: 12px;
+      color: var(--success-green);
+      font-weight: 700;
+      display: none;
+    }
+
+    .answered-status.show {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    /* Reveal screen */
+    .reveal-icon {
+      font-size: 3.5rem;
+      text-align: center;
+      margin-bottom: 8px;
+      animation: bounce 0.8s ease;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .reveal-status {
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 12px;
+      font-family: 'Bellefair', serif;
+    }
+
+    .reveal-status.correct {
+      color: var(--success-green);
+    }
+
+    .reveal-status.wrong {
+      color: var(--danger-red);
+    }
+
+    .reveal-status.timeout {
+      color: var(--warning-orange);
+    }
+
+    .reveal-points {
+      text-align: center;
+      font-size: 1.1rem;
+      color: var(--star-gold);
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .reveal-points strong {
+      font-size: 1.6rem;
+    }
+
+    .reveal-correct-answer {
+      background: rgba(0, 255, 157, 0.1);
+      border: 1px solid rgba(0, 255, 157, 0.3);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
+    .reveal-correct-label {
+      font-size: 0.8rem;
+      color: var(--success-green);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .reveal-correct-text {
+      font-size: 1rem;
+      line-height: 1.4;
+      color: var(--ghost-white);
+    }
+
+    .reveal-explanation {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 0 4px;
+    }
+
+    .reveal-countdown {
+      text-align: center;
+      margin-top: 14px;
+      color: var(--soft-purple);
+      font-size: 0.9rem;
+    }
+
+    .reveal-countdown strong {
+      color: var(--neon-cyan);
+      font-size: 1.3rem;
+      font-weight: 900;
+    }
+
+    /* Live leaderboard during game */
+    .live-leaderboard {
+      margin-top: 12px;
+    }
+
+    .live-lb-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      animation: slideInRow 0.4s ease backwards;
+    }
+
+    .live-lb-row:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .live-lb-row:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .live-lb-row:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .live-lb-row:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .live-lb-row:nth-child(5) {
+      animation-delay: 0.5s;
+    }
+
+    @keyframes slideInRow {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .live-lb-row.you {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 12px rgba(0, 245, 255, 0.3);
+    }
+
+    .live-lb-rank {
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.5);
+      width: 20px;
+    }
+
+    .live-lb-name {
+      flex: 1;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .live-lb-score {
+      font-weight: 900;
+      color: var(--star-gold);
+    }
+
+    /* Final leaderboard */
+    .final-emoji {
+      font-size: 4.5rem;
+      text-align: center;
+      margin: 8px 0;
+      animation: bounce 1s ease infinite alternate;
+    }
+
+    .final-title {
+      font-family: 'Bellefair', serif;
+      font-size: 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, var(--star-gold), var(--plasma-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+    }
+
+    .final-subtitle {
+      text-align: center;
+      color: var(--soft-purple);
+      font-size: 0.9rem;
+      margin-bottom: 14px;
+    }
+
+    .leaderboard-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      animation: slideInRow 0.5s ease backwards;
+    }
+
+    .lb-row:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .lb-row:nth-child(2) {
+      animation-delay: 0.25s;
+    }
+
+    .lb-row:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .lb-row:nth-child(4) {
+      animation-delay: 0.55s;
+    }
+
+    .lb-row:nth-child(5) {
+      animation-delay: 0.7s;
+    }
+
+    .lb-row.gold {
+      background: linear-gradient(90deg, rgba(255, 215, 0, 0.18), rgba(255, 215, 0, 0.05));
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.25);
+    }
+
+    .lb-row.silver {
+      background: linear-gradient(90deg, rgba(192, 192, 192, 0.18), rgba(192, 192, 192, 0.05));
+      border-color: rgba(192, 192, 192, 0.4);
+    }
+
+    .lb-row.bronze {
+      background: linear-gradient(90deg, rgba(205, 127, 50, 0.18), rgba(205, 127, 50, 0.05));
+      border-color: rgba(205, 127, 50, 0.4);
+    }
+
+    .lb-row.you {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 18px rgba(0, 245, 255, 0.4);
+      animation: pulseYou 2s ease-in-out infinite, slideInRow 0.5s ease backwards;
+    }
+
+    @keyframes pulseYou {
+
+      0%,
+      100% {
+        box-shadow: 0 0 18px rgba(0, 245, 255, 0.4);
+      }
+
+      50% {
+        box-shadow: 0 0 28px rgba(0, 245, 255, 0.7);
+      }
+    }
+
+    .lb-rank-emoji {
+      font-size: 1.4rem;
+      width: 36px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .lb-name {
+      flex: 1;
+      font-weight: 700;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lb-row.gold .lb-name {
+      color: var(--star-gold);
+    }
+
+    .lb-you-tag {
+      background: var(--neon-cyan);
+      color: var(--deep-space);
+      padding: 1px 7px;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 900;
+      margin-right: 6px;
+    }
+
+    .lb-score {
+      font-weight: 900;
+      color: var(--star-gold);
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* Setup needed screen */
+    .setup-warning {
+      background: rgba(255, 165, 0, 0.1);
+      border: 1px solid rgba(255, 165, 0, 0.3);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      color: var(--warning-orange);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .setup-steps {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      padding: 0 8px;
+    }
+
+    .setup-steps li {
+      margin-bottom: 8px;
+    }
+
+    .setup-steps a {
+      color: var(--neon-cyan);
+      text-decoration: underline;
+    }
+
+    /* Tablet */
+    @media (min-width: 600px) {
+      .container {
+        max-width: 600px;
+        padding: 30px 20px;
+      }
+
+      .title {
+        font-size: 2.5rem;
+      }
+
+      .card {
+        padding: 28px 24px;
+        border-radius: 22px;
+      }
+
+      .question-text {
+        font-size: 1.2rem;
+      }
+
+      .room-code-value {
+        font-size: 4rem;
+      }
+
+      .option {
+        padding: 16px 18px;
+        font-size: 1rem;
+        min-height: 60px;
+      }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .option:hover:not(:disabled) {
+        background: rgba(183, 148, 244, 0.12);
+        border-color: var(--soft-purple);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+      }
+
+      .big-action-btn:hover {
+        transform: translateY(-2px);
+        border-color: var(--ghost-white);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="stars-layer"></div>
+  <div class="nebula nebula-1"></div>
+  <div class="nebula nebula-2"></div>
+
+  <div class="container">
+
+    <!-- ===== Setup Needed Screen (no Firebase) ===== -->
+    <div class="screen" id="screen-setup">
+      <div class="header">
+        <h1 class="title">צריך הגדרת Firebase</h1>
+        <p class="subtitle">משחק חי דורש חיבור לאינטרנט משותף</p>
+      </div>
+      <div class="card">
+        <div class="setup-warning">
+          ⚙️ <strong>פעם אחת בלבד:</strong> הגדירי חיבור Firebase כדי שכל התלמידים יוכלו להתחבר ולשחק יחד בזמן אמת.
+        </div>
+        <p style="margin-bottom: 12px;">קצרה ההסבר:</p>
+        <ol class="setup-steps">
+          <li>היכנסי ל-<a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
+          <li>צרי פרויקט חדש (חינם)</li>
+          <li>הוסיפי אפליקציית Web</li>
+          <li>הפעילי "Realtime Database" במצב Test</li>
+          <li>העתיקי את הקוד <code>firebaseConfig</code> והחליפי בקובץ HTML</li>
+        </ol>
+        <p style="margin-top: 14px; font-size: 0.85rem; color: var(--soft-purple);">📖 הוראות מלאות צעד-צעד תקבלי
+          מההודעה ש-Claude שלח</p>
+      </div>
+    </div>
+
+    <!-- ===== Start Screen ===== -->
+    <div class="screen" id="screen-start">
+      <div class="header">
+        <span class="badge">⭐ משחק חי כיתתי ⭐</span>
+        <h1 class="title">חידון מערכת השמש</h1>
+        <p class="subtitle">משחק רב-משתתפים בזמן אמת 🚀</p>
+      </div>
+      <div class="card">
+        <button class="big-action-btn create" id="btnCreateRoom">
+          <div class="big-action-icon">🎮</div>
+          <div class="big-action-title">צרי משחק חדש</div>
+          <div class="big-action-desc">תקבלי קוד חדר לשתף עם הכיתה</div>
+        </button>
+        <button class="big-action-btn join" id="btnJoinRoom">
+          <div class="big-action-icon">🚪</div>
+          <div class="big-action-title">הצטרפי למשחק</div>
+          <div class="big-action-desc">יש לך כבר קוד חדר? הקלידי אותו</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== Create Room Screen ===== -->
+    <div class="screen" id="screen-create">
+      <div class="header">
+        <span class="badge">🎮 יוצרים משחק</span>
+        <h1 class="title">איך קוראים לך?</h1>
+        <p class="subtitle">השם שלך יופיע בלוח התוצאות</p>
+      </div>
+      <div class="card">
+        <label class="input-label" for="createNameInput">השם שלך:</label>
+        <input class="input" id="createNameInput" type="text" placeholder="הקלידי את שמך..." maxlength="20"
+          autocomplete="off">
+        <div class="form-error" id="createError"></div>
+        <button class="btn btn-primary" id="btnConfirmCreate">צרי משחק 🚀</button>
+        <button class="btn btn-ghost" data-back="start">→ חזרה</button>
+      </div>
+    </div>
+
+    <!-- ===== Join Room Screen ===== -->
+    <div class="screen" id="screen-join">
+      <div class="header">
+        <span class="badge">🚪 מצטרפים למשחק</span>
+        <h1 class="title">הקלידי את הקוד</h1>
+        <p class="subtitle">הקוד הוא 4 אותיות וקיבלת אותו מהמורה/חבר</p>
+      </div>
+      <div class="card">
+        <label class="input-label" for="joinCodeInput">קוד החדר:</label>
+        <input class="input input-code" id="joinCodeInput" type="text" placeholder="ABCD" maxlength="4"
+          autocomplete="off" inputmode="text">
+
+        <label class="input-label" for="joinNameInput" style="margin-top: 16px;">השם שלך:</label>
+        <input class="input" id="joinNameInput" type="text" placeholder="הקלידי את שמך..." maxlength="20"
+          autocomplete="off">
+
+        <div class="form-error" id="joinError"></div>
+        <button class="btn btn-primary" id="btnConfirmJoin">הצטרפי 🎯</button>
+        <button class="btn btn-ghost" data-back="start">→ חזרה</button>
+      </div>
+    </div>
+
+    <!-- ===== Lobby Screen ===== -->
+    <div class="screen" id="screen-lobby">
+      <div class="card">
+        <div class="room-code-display">
+          <div class="room-code-label">קוד החדר</div>
+          <div class="room-code-value" id="lobbyCode">----</div>
+          <div class="room-code-hint">שתפי את הקוד הזה עם הכיתה</div>
+        </div>
+        <button class="btn btn-secondary" id="btnShareCode">📤 שתפי קישור עם הכיתה</button>
+      </div>
+
+      <div class="card">
+        <div class="players-section">
+          <div class="players-header">
+            <span class="players-title">👥 שחקנים בחדר</span>
+            <span class="players-count" id="lobbyPlayerCount">0</span>
+          </div>
+          <div class="players-list" id="lobbyPlayersList">
+            <div class="lobby-empty">מחכים שאחרים יצטרפו...</div>
+          </div>
+        </div>
+
+        <div id="hostControls" style="display: none;">
+          <button class="btn btn-primary" id="btnStartGame">התחילי את המשחק! 🚀</button>
+        </div>
+        <div id="guestWaiting" class="waiting-msg">
+          ⏳ מחכים ש<span id="waitingHostName">המורה</span> תתחיל<span class="waiting-dots"></span>
+        </div>
+      </div>
+
+      <button class="btn btn-ghost" id="btnLeaveLobby">→ צאי מהחדר</button>
+    </div>
+
+    <!-- ===== Question Screen ===== -->
+    <div class="screen" id="screen-question">
+      <div class="quiz-header">
+        <div class="player-tag">
+          <span>👨‍🚀</span>
+          <span class="player-name-display" id="qPlayerName"></span>
+        </div>
+        <div class="score-display">⭐ <span id="qScore">0</span></div>
+      </div>
+
+      <div class="progress-info">
+        <span>שאלה <span id="qCurrent">1</span> מתוך <span id="qTotal">15</span></span>
+        <span id="qAnsweredCount">0/0 ענו</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="qProgressFill"></div>
+      </div>
+
+      <div class="card">
+        <div class="timer-container">
+          <svg class="timer-ring" viewBox="0 0 60 60">
+            <circle cx="30" cy="30" r="26" class="timer-bg" />
+            <circle cx="30" cy="30" r="26" class="timer-progress" id="qTimerProgress" />
+          </svg>
+          <div class="timer-text" id="qTimerText">30</div>
+        </div>
+
+        <div class="question-text">
+          <span class="question-number" id="qNum">שאלה 1</span>
+          <span id="qText"></span>
+        </div>
+
+        <div class="options" id="qOptions"></div>
+        <div class="answered-status" id="qAnsweredStatus">✓ קיבלנו את התשובה שלך! מחכים לאחרים...</div>
+      </div>
+    </div>
+
+    <!-- ===== Reveal Screen ===== -->
+    <div class="screen" id="screen-reveal">
+      <div class="quiz-header">
+        <div class="player-tag">
+          <span>👨‍🚀</span>
+          <span class="player-name-display" id="rPlayerName"></span>
+        </div>
+        <div class="score-display">⭐ <span id="rScore">0</span></div>
+      </div>
+
+      <div class="card">
+        <div class="reveal-icon" id="rIcon">🎯</div>
+        <div class="reveal-status" id="rStatus">צדקת!</div>
+        <div class="reveal-points" id="rPoints"></div>
+
+        <div class="reveal-correct-answer">
+          <div class="reveal-correct-label">✓ התשובה הנכונה</div>
+          <div class="reveal-correct-text" id="rCorrectText"></div>
+        </div>
+
+        <div class="reveal-explanation" id="rExplanation"></div>
+
+        <div class="reveal-countdown">
+          <span id="rCountdownText">השאלה הבאה בעוד</span> <strong id="rCountdown">5</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="players-header">
+          <span class="players-title">🏆 דירוג נוכחי</span>
+        </div>
+        <div class="live-leaderboard" id="rLiveLeaderboard"></div>
+      </div>
+    </div>
+
+    <!-- ===== Finished Screen ===== -->
+    <div class="screen" id="screen-finished">
+      <div class="card">
+        <div class="final-emoji" id="fEmoji">🏆</div>
+        <h2 class="final-title" id="fTitle">המשחק הסתיים!</h2>
+        <p class="final-subtitle" id="fSubtitle">הנה התוצאות הסופיות</p>
+      </div>
+
+      <div class="card">
+        <div class="leaderboard-list" id="fLeaderboardList"></div>
+        <button class="btn btn-secondary" id="btnPlayAgain">→ חזרה לתפריט הראשי</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== Game Logic ===== -->
+  <script type="module">
+    // ============================================================
+    // 🔥 הגדרות Firebase - להחליף בערכים שלך!
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-m5CtRIdscaFhlRO2RA38tQ2ApQxmR50",
+      authDomain: "yoyo-solar-system.firebaseapp.com",
+      databaseURL: "https://yoyo-solar-system-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "yoyo-solar-system",
+      storageBucket: "yoyo-solar-system.firebasestorage.app",
+      messagingSenderId: "54783636886",
+      appId: "1:54783636886:web:72e95fe4c3241d657319b7",
+      measurementId: "G-8R4FBPDK6S"
+    };
+    // ============================================================
+
+    const FIREBASE_CONFIGURED = firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY";
+
+    let db = null, fns = null;
+
+    if (!FIREBASE_CONFIGURED) {
+      showScreen('setup');
+    } else {
+      try {
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
+        const { getDatabase, ref, set, get, update, onValue, off, onDisconnect, remove } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js");
+        const app = initializeApp(firebaseConfig);
+        db = getDatabase(app);
+        fns = { ref, set, get, update, onValue, off, onDisconnect, remove };
+        init();
+      } catch (e) {
+        console.error("Firebase init failed:", e);
+        showScreen('setup');
+      }
+    }
+
+    // ===== Questions =====
+    const questions = [
+      {
+        q: "למה פלוטו ונפטון לא מתנגשים אחד בשני, למרות שהמסלולים שלהם חוצים זה את זה?",
+        options: ["כי פלוטו תמיד נמצא רחוק מנפטון", "כי הם נמצאים במישורים שונים, אחד מעל השני", "כי נפטון בורח מפלוטו במהירות", "כי השמש דוחפת אותם זה מזה"],
+        correct: 1, explanation: "נכון! נקודת המפגש שלהם היא רק במרחק זהה מהשמש, אבל הם נמצאים במישורים שונים - זה מעל זה - ולכן לא מתנגשים."
+      },
+      {
+        q: "כמה כוכבי לכת יש במערכת השמש שלנו?",
+        options: ["שבעה", "שמונה", "תשעה", "עשרה"],
+        correct: 1, explanation: "בדיוק! יש 8 כוכבי לכת. פלוטו הוא כוכב לכת ננסי וסדנה הוא מינורי."
+      },
+      {
+        q: "מהו אסטרואיד?",
+        options: ["כוכב מאיר שמייצר אנרגיה", "ירח של כוכב הלכת מאדים", "גוף סלעי שמקיף את השמש", "סוג של כוכב שביט עם זנב"],
+        correct: 2, explanation: "מצוין! אסטרואידים הם גופים סלעיים שמקיפים את השמש."
+      },
+      {
+        q: "איזה כוכב לכת מכונה 'שואב האבק' של מערכת השמש?",
+        options: ["שבתאי", "צדק", "נפטון", "אורנוס"],
+        correct: 1, explanation: "כל הכבוד! צדק נקרא 'שואב האבק' כי כוח המשיכה שלו לוכד מטאורים."
+      },
+      {
+        q: "לפי המדידות, איזה כוכב לכת הוא הקר ביותר במערכת השמש?",
+        options: ["נפטון", "פלוטו", "שבתאי", "אורנוס"],
+        correct: 3, explanation: "מפתיע אבל נכון! דווקא אורנוס מתגלה כקר ביותר."
+      },
+      {
+        q: "איזה כוכב לכת נחשב ל'תאום' של כדור הארץ?",
+        options: ["נוגה", "חמה", "מאדים", "צדק"],
+        correct: 2, explanation: "נכון מאוד! מאדים נחשב לתאום של כדור הארץ - יש לו אטמוספרה ואולי בעבר היו עליו מים."
+      },
+      {
+        q: "מי היה האסטרונאוט הישראלי הראשון?",
+        options: ["באז אולדרין", "יורי גגארין", "אילן רמון", "ניל ארמסטרונג"],
+        correct: 2, explanation: "אילן רמון ז\"ל היה האסטרונאוט הישראלי הראשון, במעבורת קולומביה (2003)."
+      },
+      {
+        q: "מדוע פני השטח של נוגה חמים יותר מכוכב חמה, למרות שנוגה רחוק יותר מהשמש?",
+        options: ["כי נוגה קטן בהרבה מחמה", "בגלל אפקט החממה - פחמן דו חמצני באטמוספרה", "כי נוגה מסתובב מהר יותר", "בגלל ההשפעה של הירח שלו"],
+        correct: 1, explanation: "מדויק! האטמוספרה של נוגה עשירה בפחמן דו חמצני שיוצר אפקט חממה - מעל 400 מעלות!"
+      },
+      {
+        q: "היכן ממוקמת חגורת האסטרואידים במערכת השמש?",
+        options: ["בין השמש לכוכב חמה", "בין כדור הארץ לנוגה", "אחרי כוכב הלכת נפטון", "בין מאדים לצדק"],
+        correct: 3, explanation: "נכון! חגורת האסטרואידים בין מאדים לצדק."
+      },
+      {
+        q: "מהו כוכב שביט?",
+        options: ["כוכב לכת קטן וסלעי", "ירח גדול של כוכב הלכת צדק", "גוף הנע בחלל המורכב ברובו מקרח", "כוכב שמייצר אור משלו"],
+        correct: 2, explanation: "בדיוק! כוכב שביט מורכב ברובו מקרח. כשהוא מתקרב לשמש נוצר לו זנב."
+      },
+      {
+        q: "מה ההבדל העיקרי בין כוכבי הלכת הפנימיים לחיצוניים?",
+        options: ["הפנימיים סלעיים, החיצוניים ענקי גזים", "הפנימיים גדולים יותר", "אין הבדל משמעותי", "הפנימיים קרים יותר"],
+        correct: 0, explanation: "מעולה! הפנימיים סלעיים, החיצוניים ענקי גזים."
+      },
+      {
+        q: "מהו 'צדק חם' (Hot Jupiter)?",
+        options: ["צדק שלנו בעונת הקיץ", "ענק גז במערכת שמש אחרת שקרוב מאוד לשמש שלו", "כוכב לכת ננסי ליד השמש", "ירח חדש שהתגלה ליד צדק"],
+        correct: 1, explanation: "נכון! 'צדק חם' הוא ענק גז במערכת שמש אחרת שקרוב לשמש שלו."
+      },
+      {
+        q: "לפני כמה זמן נוצר כדור הארץ?",
+        options: ["מיליון שנה", "מאה מיליון שנה", "4.5 מיליארד שנה", "10 מיליארד שנה"],
+        correct: 2, explanation: "כל הכבוד! כדור הארץ נוצר לפני 4.5 מיליארד שנה."
+      },
+      {
+        q: "מהו מיקומו של כדור הארץ בין כוכבי הלכת מהשמש?",
+        options: ["הראשון", "השני", "השלישי", "הרביעי"],
+        correct: 2, explanation: "מצוין! כדור הארץ הוא השלישי - אחרי חמה ונוגה."
+      },
+      {
+        q: "באיזו שנה הצליחה נאס\"א להנחית אדם על הירח?",
+        options: ["1958", "1969", "1986", "2003"],
+        correct: 1, explanation: "מדויק! ב-1969, במסגרת תוכנית אפולו."
+      }
+    ];
+
+    // ===== Constants =====
+    const QUESTION_TIME = 30;
+    const REVEAL_TIME = 6;
+    const TIMER_CIRCUMFERENCE = 163.36;
+    const ROOM_CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ";
+
+    // ===== State =====
+    let myId = getMyId();
+    let myName = '';
+    let roomCode = null;
+    let isHost = false;
+    let roomData = null;
+    let unsubscribeRoom = null;
+    let qTimerInterval = null;
+    let revealCountdownInterval = null;
+    let lastQuestionIndex = -1;
+    let lastState = null;
+    let myAnswerSubmitted = false;
+
+    function getMyId() {
+      let id;
+      try {
+        id = localStorage.getItem('quiz_player_id');
+        if (!id) {
+          id = 'p_' + Math.random().toString(36).slice(2, 11);
+          localStorage.setItem('quiz_player_id', id);
+        }
+      } catch {
+        id = 'p_' + Math.random().toString(36).slice(2, 11);
+      }
+      return id;
+    }
+
+    // ===== Helpers =====
+    function $(id) { return document.getElementById(id); }
+    function showScreen(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const screen = $(`screen-${name}`);
+      if (screen) screen.classList.add('active');
+      window.scrollTo({ top: 0 });
+    }
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+    function genRoomCode() {
+      let code = '';
+      for (let i = 0; i < 4; i++) code += ROOM_CODE_CHARS[Math.floor(Math.random() * ROOM_CODE_CHARS.length)];
+      return code;
+    }
+
+    // ===== Init =====
+    function init() {
+      showScreen('start');
+      bindEvents();
+
+      // Auto-fill room code from URL hash
+      const hash = window.location.hash.replace('#', '').toUpperCase();
+      if (hash.length === 4 && /^[A-Z]+$/.test(hash)) {
+        setTimeout(() => {
+          $('btnJoinRoom').click();
+          $('joinCodeInput').value = hash;
+          $('joinNameInput').focus();
+        }, 100);
+      }
+    }
+
+    function bindEvents() {
+      // Start screen
+      $('btnCreateRoom').addEventListener('click', () => {
+        showScreen('create');
+        setTimeout(() => $('createNameInput').focus(), 100);
+      });
+      $('btnJoinRoom').addEventListener('click', () => {
+        showScreen('join');
+        setTimeout(() => $('joinCodeInput').focus(), 100);
+      });
+
+      // Back buttons
+      document.querySelectorAll('[data-back]').forEach(btn => {
+        btn.addEventListener('click', () => showScreen(btn.dataset.back));
+      });
+
+      // Create flow
+      $('btnConfirmCreate').addEventListener('click', handleCreate);
+      $('createNameInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleCreate(); });
+
+      // Join flow
+      $('joinCodeInput').addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+      });
+      $('btnConfirmJoin').addEventListener('click', handleJoin);
+      $('joinNameInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleJoin(); });
+      $('joinCodeInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') $('joinNameInput').focus();
+      });
+
+      // Lobby
+      $('btnShareCode').addEventListener('click', shareLink);
+      $('btnStartGame').addEventListener('click', startGame);
+      $('btnLeaveLobby').addEventListener('click', leaveRoom);
+
+      // Finished
+      $('btnPlayAgain').addEventListener('click', () => {
+        leaveRoom();
+      });
+
+      // Prevent zoom
+      let lastTap = 0;
+      document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTap <= 300) e.preventDefault();
+        lastTap = now;
+      }, { passive: false });
+    }
+
+    // ===== Create room =====
+    async function handleCreate() {
+      const name = $('createNameInput').value.trim();
+      const errorEl = $('createError');
+
+      if (!name) { errorEl.textContent = 'אנא הקלידי את שמך'; return; }
+      if (name.length < 2) { errorEl.textContent = 'השם קצר מדי'; return; }
+      errorEl.textContent = '';
+
+      $('btnConfirmCreate').disabled = true;
+      $('btnConfirmCreate').textContent = 'יוצרים...';
+
+      try {
+        // Generate unique code
+        let code, attempts = 0;
+        while (attempts < 5) {
+          code = genRoomCode();
+          const snap = await fns.get(fns.ref(db, `rooms/${code}`));
+          if (!snap.exists()) break;
+          attempts++;
+        }
+
+        myName = name;
+        roomCode = code;
+        isHost = true;
+
+        await fns.set(fns.ref(db, `rooms/${code}`), {
+          code,
+          state: 'lobby',
+          currentQuestion: -1,
+          hostId: myId,
+          hostName: name,
+          createdAt: Date.now(),
+          players: {
+            [myId]: { name, score: 0, joinedAt: Date.now() }
+          }
+        });
+
+        // Auto-cleanup if disconnected and lobby
+        fns.onDisconnect(fns.ref(db, `rooms/${code}/players/${myId}`)).remove();
+
+        listenToRoom(code);
+      } catch (e) {
+        console.error(e);
+        errorEl.textContent = 'שגיאה ביצירת המשחק. נסי שוב.';
+        $('btnConfirmCreate').disabled = false;
+        $('btnConfirmCreate').textContent = 'צרי משחק 🚀';
+      }
+    }
+
+    // ===== Join room =====
+    async function handleJoin() {
+      const code = $('joinCodeInput').value.trim().toUpperCase();
+      const name = $('joinNameInput').value.trim();
+      const errorEl = $('joinError');
+
+      if (!code || code.length !== 4) { errorEl.textContent = 'הקוד חייב להיות 4 אותיות'; return; }
+      if (!name) { errorEl.textContent = 'אנא הקלידי את שמך'; return; }
+      if (name.length < 2) { errorEl.textContent = 'השם קצר מדי'; return; }
+      errorEl.textContent = '';
+
+      $('btnConfirmJoin').disabled = true;
+      $('btnConfirmJoin').textContent = 'מצטרפים...';
+
+      try {
+        const roomRef = fns.ref(db, `rooms/${code}`);
+        const snap = await fns.get(roomRef);
+        if (!snap.exists()) {
+          errorEl.textContent = 'קוד לא נכון - לא נמצא חדר כזה';
+          $('btnConfirmJoin').disabled = false;
+          $('btnConfirmJoin').textContent = 'הצטרפי 🎯';
+          return;
+        }
+        const data = snap.val();
+        if (data.state !== 'lobby') {
+          errorEl.textContent = 'המשחק כבר התחיל - לא ניתן להצטרף עכשיו';
+          $('btnConfirmJoin').disabled = false;
+          $('btnConfirmJoin').textContent = 'הצטרפי 🎯';
+          return;
+        }
+
+        myName = name;
+        roomCode = code;
+        isHost = data.hostId === myId;
+
+        await fns.set(fns.ref(db, `rooms/${code}/players/${myId}`), {
+          name, score: 0, joinedAt: Date.now()
+        });
+
+        fns.onDisconnect(fns.ref(db, `rooms/${code}/players/${myId}`)).remove();
+
+        listenToRoom(code);
+      } catch (e) {
+        console.error(e);
+        errorEl.textContent = 'שגיאה. בדקי את החיבור לאינטרנט.';
+        $('btnConfirmJoin').disabled = false;
+        $('btnConfirmJoin').textContent = 'הצטרפי 🎯';
+      }
+    }
+
+    // ===== Listen to room =====
+    function listenToRoom(code) {
+      if (unsubscribeRoom) unsubscribeRoom();
+      const roomRef = fns.ref(db, `rooms/${code}`);
+      const cb = fns.onValue(roomRef, (snap) => {
+        const data = snap.val();
+        if (!data) {
+          cleanupAndExit('המשחק הסתיים או נסגר');
+          return;
+        }
+        roomData = data;
+        handleRoomUpdate();
+      });
+      unsubscribeRoom = () => fns.off(roomRef);
+
+      // Update URL hash for sharing
+      window.history.replaceState(null, '', `#${code}`);
+    }
+
+    function cleanupAndExit(msg) {
+      if (unsubscribeRoom) { unsubscribeRoom(); unsubscribeRoom = null; }
+      if (qTimerInterval) { clearInterval(qTimerInterval); qTimerInterval = null; }
+      if (revealCountdownInterval) { clearInterval(revealCountdownInterval); revealCountdownInterval = null; }
+      roomData = null; roomCode = null; isHost = false; lastState = null; lastQuestionIndex = -1;
+      window.history.replaceState(null, '', window.location.pathname);
+      if (msg) setTimeout(() => alert(msg), 100);
+      showScreen('start');
+
+      // Reset buttons
+      $('btnConfirmCreate').disabled = false;
+      $('btnConfirmCreate').textContent = 'צרי משחק 🚀';
+      $('btnConfirmJoin').disabled = false;
+      $('btnConfirmJoin').textContent = 'הצטרפי 🎯';
+    }
+
+    // ===== Handle room state changes =====
+    function handleRoomUpdate() {
+      const state = roomData.state;
+      const stateChanged = state !== lastState;
+      const questionChanged = roomData.currentQuestion !== lastQuestionIndex;
+
+      if (state === 'lobby') {
+        if (stateChanged) showScreen('lobby');
+        renderLobby();
+      } else if (state === 'question') {
+        if (stateChanged || questionChanged) {
+          myAnswerSubmitted = false;
+          showScreen('question');
+          lastQuestionIndex = roomData.currentQuestion;
+        }
+        renderQuestion();
+      } else if (state === 'reveal') {
+        if (stateChanged) {
+          showScreen('reveal');
+          renderReveal();
+          startRevealCountdown();
+        } else {
+          // Update live leaderboard
+          renderLiveLeaderboard();
+        }
+      } else if (state === 'finished') {
+        if (stateChanged) {
+          showScreen('finished');
+          renderFinished();
+        }
+      }
+
+      lastState = state;
+    }
+
+    // ===== LOBBY =====
+    function renderLobby() {
+      $('lobbyCode').textContent = roomData.code;
+      const players = roomData.players || {};
+      const playerArr = Object.entries(players).sort((a, b) => a[1].joinedAt - b[1].joinedAt);
+
+      $('lobbyPlayerCount').textContent = playerArr.length;
+
+      const listEl = $('lobbyPlayersList');
+      if (playerArr.length === 0) {
+        listEl.innerHTML = '<div class="lobby-empty">מחכים שאחרים יצטרפו...</div>';
+      } else {
+        listEl.innerHTML = playerArr.map(([id, p]) => {
+          const isHostPlayer = id === roomData.hostId;
+          const isYou = id === myId;
+          let cls = 'player-chip';
+          if (isHostPlayer) cls += ' host';
+          else if (isYou) cls += ' you';
+          const icon = isHostPlayer ? '👑 ' : (isYou ? '⭐ ' : '');
+          const tag = isYou && !isHostPlayer ? ' (את/ה)' : '';
+          return `<div class="${cls}">${icon}${escapeHtml(p.name)}${tag}</div>`;
+        }).join('');
+      }
+
+      if (isHost) {
+        $('hostControls').style.display = 'block';
+        $('guestWaiting').style.display = 'none';
+        $('btnStartGame').disabled = playerArr.length < 1;
+      } else {
+        $('hostControls').style.display = 'none';
+        $('guestWaiting').style.display = 'block';
+        $('waitingHostName').textContent = roomData.hostName || 'המורה';
+      }
+    }
+
+    async function shareLink() {
+      const url = `${window.location.origin}${window.location.pathname}#${roomData.code}`;
+      const text = `הצטרפו למשחק חידון מערכת השמש! קוד: ${roomData.code}`;
+      if (navigator.share) {
+        try { await navigator.share({ title: 'חידון מערכת השמש', text, url }); } catch { }
+      } else {
+        try {
+          await navigator.clipboard.writeText(`${text}\n${url}`);
+          alert('✓ הקישור הועתק! אפשר להדביק בוואטסאפ');
+        } catch {
+          prompt('העתיקי את הקישור:', url);
+        }
+      }
+    }
+
+    async function startGame() {
+      if (!isHost) return;
+      $('btnStartGame').disabled = true;
+      await fns.update(fns.ref(db, `rooms/${roomCode}`), {
+        state: 'question',
+        currentQuestion: 0,
+        questionStartTime: Date.now()
+      });
+    }
+
+    async function leaveRoom() {
+      if (roomCode && myId) {
+        try {
+          // If host, delete the whole room. Otherwise just remove self.
+          if (isHost) {
+            await fns.remove(fns.ref(db, `rooms/${roomCode}`));
+          } else {
+            await fns.remove(fns.ref(db, `rooms/${roomCode}/players/${myId}`));
+          }
+        } catch { }
+      }
+      cleanupAndExit();
+    }
+
+    // ===== QUESTION =====
+    function renderQuestion() {
+      const qIdx = roomData.currentQuestion;
+      const q = questions[qIdx];
+      const me = roomData.players?.[myId];
+
+      $('qPlayerName').textContent = myName;
+      $('qScore').textContent = (me?.score || 0).toLocaleString();
+      $('qNum').textContent = `שאלה ${qIdx + 1}`;
+      $('qText').textContent = q.q;
+      $('qCurrent').textContent = qIdx + 1;
+      $('qTotal').textContent = questions.length;
+      $('qProgressFill').style.width = (((qIdx + 1) / questions.length) * 100) + '%';
+
+      // Players answered count
+      const players = roomData.players || {};
+      const playerCount = Object.keys(players).length;
+      const answeredCount = Object.values(players).filter(p => p.answeredCurrent).length;
+      $('qAnsweredCount').textContent = `${answeredCount}/${playerCount} ענו`;
+
+      // Build options if not built or question changed
+      const optionsEl = $('qOptions');
+      if (optionsEl.dataset.qIdx !== String(qIdx)) {
+        optionsEl.dataset.qIdx = qIdx;
+        optionsEl.innerHTML = '';
+        const letters = ['א', 'ב', 'ג', 'ד'];
+        q.options.forEach((opt, i) => {
+          const btn = document.createElement('button');
+          btn.className = 'option';
+          btn.innerHTML = `
+        <div class="option-letter">${letters[i]}</div>
+        <div class="option-text">${escapeHtml(opt)}</div>
+      `;
+          btn.addEventListener('click', () => submitAnswer(i));
+          optionsEl.appendChild(btn);
+        });
+        $('qAnsweredStatus').classList.remove('show');
+      }
+
+      // Mark current player's selected option
+      if (me?.lastAnswer && me.lastAnswer.questionIdx === qIdx) {
+        myAnswerSubmitted = true;
+        document.querySelectorAll('.option').forEach((opt, i) => {
+          opt.disabled = true;
+          if (i === me.lastAnswer.selected) opt.classList.add('selected');
+        });
+        $('qAnsweredStatus').classList.add('show');
+      }
+
+      // Start/update timer
+      startQuestionTimer();
+    }
+
+    function startQuestionTimer() {
+      if (qTimerInterval) clearInterval(qTimerInterval);
+      const startTime = roomData.questionStartTime;
+      const tick = () => {
+        if (!roomData || roomData.state !== 'question') {
+          clearInterval(qTimerInterval);
+          qTimerInterval = null;
+          return;
+        }
+        const elapsed = (Date.now() - startTime) / 1000;
+        const remaining = Math.max(0, QUESTION_TIME - elapsed);
+        updateTimerUI(Math.ceil(remaining));
+        if (remaining <= 0) {
+          clearInterval(qTimerInterval);
+          qTimerInterval = null;
+          // Host advances to reveal
+          if (isHost) {
+            advanceToReveal();
+          }
+        }
+      };
+      tick();
+      qTimerInterval = setInterval(tick, 250);
+    }
+
+    function updateTimerUI(t) {
+      const progressEl = $('qTimerProgress');
+      const textEl = $('qTimerText');
+      textEl.textContent = t;
+      const offset = TIMER_CIRCUMFERENCE * (1 - t / QUESTION_TIME);
+      progressEl.style.strokeDashoffset = offset;
+
+      progressEl.classList.remove('warning', 'danger');
+      textEl.classList.remove('warning', 'danger');
+      if (t <= 5) {
+        progressEl.classList.add('danger');
+        textEl.classList.add('danger');
+      } else if (t <= 12) {
+        progressEl.classList.add('warning');
+        textEl.classList.add('warning');
+      }
+    }
+
+    async function submitAnswer(selectedIdx) {
+      if (myAnswerSubmitted || !roomData || roomData.state !== 'question') return;
+      myAnswerSubmitted = true;
+
+      const qIdx = roomData.currentQuestion;
+      const q = questions[qIdx];
+      const isCorrect = selectedIdx === q.correct;
+      const elapsed = (Date.now() - roomData.questionStartTime) / 1000;
+      const timeLeft = Math.max(0, QUESTION_TIME - elapsed);
+
+      let points = 0;
+      if (isCorrect) {
+        points = 100 + Math.round((timeLeft / QUESTION_TIME) * 100);
+      }
+
+      const currentScore = roomData.players?.[myId]?.score || 0;
+
+      // UI update
+      document.querySelectorAll('.option').forEach((opt, i) => {
+        opt.disabled = true;
+        if (i === selectedIdx) opt.classList.add('selected');
+      });
+      $('qAnsweredStatus').classList.add('show');
+
+      if (navigator.vibrate) navigator.vibrate(50);
+
+      try {
+        await fns.update(fns.ref(db, `rooms/${roomCode}/players/${myId}`), {
+          score: currentScore + points,
+          answeredCurrent: true,
+          lastAnswer: {
+            questionIdx: qIdx,
+            selected: selectedIdx,
+            isCorrect,
+            points
+          }
+        });
+      } catch (e) {
+        console.error('Submit failed', e);
+      }
+    }
+
+    async function advanceToReveal() {
+      if (!isHost) return;
+      try {
+        await fns.update(fns.ref(db, `rooms/${roomCode}`), {
+          state: 'reveal',
+          revealStartTime: Date.now()
+        });
+      } catch (e) { console.error(e); }
+    }
+
+    // ===== REVEAL =====
+    function renderReveal() {
+      const qIdx = roomData.currentQuestion;
+      const q = questions[qIdx];
+      const me = roomData.players?.[myId];
+
+      $('rPlayerName').textContent = myName;
+      $('rScore').textContent = (me?.score || 0).toLocaleString();
+
+      const myAnswer = me?.lastAnswer;
+      const answeredThisQ = myAnswer && myAnswer.questionIdx === qIdx;
+
+      if (!answeredThisQ) {
+        // Timeout - didn't answer
+        $('rIcon').textContent = '⏰';
+        $('rStatus').textContent = 'נגמר הזמן';
+        $('rStatus').className = 'reveal-status timeout';
+        $('rPoints').innerHTML = '0 נקודות הפעם 🌌';
+      } else if (myAnswer.isCorrect) {
+        $('rIcon').textContent = '🎯';
+        $('rStatus').textContent = 'צדקת!';
+        $('rStatus').className = 'reveal-status correct';
+        $('rPoints').innerHTML = `<strong>+${myAnswer.points}</strong> נקודות`;
+      } else {
+        $('rIcon').textContent = '💫';
+        $('rStatus').textContent = 'לא נכון';
+        $('rStatus').className = 'reveal-status wrong';
+        $('rPoints').innerHTML = '0 נקודות הפעם';
+      }
+
+      $('rCorrectText').textContent = q.options[q.correct];
+      $('rExplanation').textContent = q.explanation;
+
+      // Live leaderboard
+      renderLiveLeaderboard();
+    }
+
+    function renderLiveLeaderboard() {
+      const players = roomData.players || {};
+      const sorted = Object.entries(players)
+        .map(([id, p]) => ({ id, ...p }))
+        .sort((a, b) => (b.score || 0) - (a.score || 0))
+        .slice(0, 5);
+
+      const listEl = $('rLiveLeaderboard');
+      if (sorted.length === 0) {
+        listEl.innerHTML = '<div class="lobby-empty">אין נתונים</div>';
+        return;
+      }
+
+      listEl.innerHTML = sorted.map((p, i) => {
+        const cls = 'live-lb-row' + (p.id === myId ? ' you' : '');
+        const medal = ['🥇', '🥈', '🥉', '🏅', '🏅'][i];
+        return `
+      <div class="${cls}">
+        <div class="live-lb-rank">${medal}</div>
+        <div class="live-lb-name">${escapeHtml(p.name)}${p.id === myId ? ' (את/ה)' : ''}</div>
+        <div class="live-lb-score">${(p.score || 0).toLocaleString()}</div>
+      </div>
+    `;
+      }).join('');
+    }
+
+    function startRevealCountdown() {
+      if (revealCountdownInterval) clearInterval(revealCountdownInterval);
+      const startTime = roomData.revealStartTime || Date.now();
+      const tick = () => {
+        if (!roomData || roomData.state !== 'reveal') {
+          clearInterval(revealCountdownInterval);
+          revealCountdownInterval = null;
+          return;
+        }
+        const elapsed = (Date.now() - startTime) / 1000;
+        const remaining = Math.max(0, REVEAL_TIME - elapsed);
+        $('rCountdown').textContent = Math.ceil(remaining);
+        if (remaining <= 0) {
+          clearInterval(revealCountdownInterval);
+          revealCountdownInterval = null;
+          // Host advances
+          if (isHost) advanceFromReveal();
+        }
+      };
+      tick();
+      revealCountdownInterval = setInterval(tick, 250);
+    }
+
+    async function advanceFromReveal() {
+      if (!isHost || !roomData) return;
+      const next = roomData.currentQuestion + 1;
+      try {
+        if (next >= questions.length) {
+          // Finish game
+          await fns.update(fns.ref(db, `rooms/${roomCode}`), {
+            state: 'finished'
+          });
+        } else {
+          // Reset answers
+          const players = roomData.players || {};
+          const updates = {
+            state: 'question',
+            currentQuestion: next,
+            questionStartTime: Date.now()
+          };
+          Object.keys(players).forEach(pid => {
+            updates[`players/${pid}/answeredCurrent`] = false;
+          });
+          await fns.update(fns.ref(db, `rooms/${roomCode}`), updates);
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    // ===== FINISHED =====
+    function renderFinished() {
+      const players = roomData.players || {};
+      const sorted = Object.entries(players)
+        .map(([id, p]) => ({ id, ...p }))
+        .sort((a, b) => (b.score || 0) - (a.score || 0));
+      const top5 = sorted.slice(0, 5);
+      const myRank = sorted.findIndex(p => p.id === myId) + 1;
+
+      // Title based on rank
+      let emoji, title, subtitle;
+      if (myRank === 1) {
+        emoji = '🏆'; title = 'ניצחת!'; subtitle = `המקום הראשון! את אלופת הכיתה 🌟`;
+      } else if (myRank === 2) {
+        emoji = '🥈'; title = 'מקום שני!'; subtitle = 'תוצאה מצוינת!';
+      } else if (myRank === 3) {
+        emoji = '🥉'; title = 'מקום שלישי!'; subtitle = 'על הפודיום!';
+      } else if (myRank > 0 && myRank <= 5) {
+        emoji = '🏅'; title = 'בטופ 5!'; subtitle = `סיימת במקום ${myRank}`;
+      } else {
+        emoji = '🚀'; title = 'המשחק הסתיים!'; subtitle = `סיימת במקום ${myRank} מתוך ${sorted.length}`;
+      }
+
+      $('fEmoji').textContent = emoji;
+      $('fTitle').textContent = title;
+      $('fSubtitle').textContent = subtitle;
+
+      // Leaderboard
+      const medals = ['🥇', '🥈', '🥉', '🏅', '🏅'];
+      $('fLeaderboardList').innerHTML = top5.map((p, i) => {
+        let cls = 'lb-row';
+        if (i === 0) cls += ' gold';
+        else if (i === 1) cls += ' silver';
+        else if (i === 2) cls += ' bronze';
+        if (p.id === myId) cls += ' you';
+        return `
+      <div class="${cls}">
+        <div class="lb-rank-emoji">${medals[i]}</div>
+        <div class="lb-name">
+          ${escapeHtml(p.name)}
+          ${p.id === myId ? '<span class="lb-you-tag">את/ה!</span>' : ''}
+        </div>
+        <div class="lb-score">${(p.score || 0).toLocaleString()}</div>
+      </div>
+    `;
+      }).join('');
+
+      // 🎉 Celebrate based on my rank
+      setTimeout(() => celebrateRank(myRank), 500);
+    }
+
+    // ===== Victory Animations =====
+    function celebrateRank(rank) {
+      if (typeof confetti === 'undefined') return;
+
+      if (rank === 1) {
+        const colors = ['#ffd700', '#ff3e9d', '#00f5ff', '#b794f4', '#00ff9d'];
+        confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 }, colors, scalar: 1.2 });
+        setTimeout(() => {
+          confetti({ particleCount: 120, angle: 60, spread: 70, origin: { x: 0, y: 0.7 }, colors });
+          confetti({ particleCount: 120, angle: 120, spread: 70, origin: { x: 1, y: 0.7 }, colors });
+        }, 300);
+        let count = 0;
+        const interval = setInterval(() => {
+          confetti({
+            particleCount: 40,
+            angle: 60 + Math.random() * 60, spread: 80,
+            origin: { x: Math.random(), y: 0.6 + Math.random() * 0.2 },
+            colors, scalar: 0.9 + Math.random() * 0.4
+          });
+          count++;
+          if (count >= 12) clearInterval(interval);
+        }, 350);
+        setTimeout(() => {
+          confetti({
+            particleCount: 80, startVelocity: 30, spread: 360,
+            origin: { x: 0.5, y: 0 },
+            colors: ['#ffd700', '#ffffff'],
+            shapes: ['star'], scalar: 1.4
+          });
+        }, 800);
+      } else if (rank === 2 || rank === 3) {
+        confetti({
+          particleCount: 150, spread: 80, origin: { y: 0.6 },
+          colors: ['#c0c0c0', '#ffd700', '#cd7f32', '#00f5ff']
+        });
+        setTimeout(() => {
+          confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0.1, y: 0.7 } });
+          confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 0.9, y: 0.7 } });
+        }, 250);
+      } else if (rank > 0 && rank <= 5) {
+        confetti({
+          particleCount: 80, spread: 65, origin: { y: 0.65 },
+          colors: ['#00f5ff', '#b794f4', '#ff3e9d']
+        });
+      }
+    }
+  </script>
+
+</body>
+
+</html>
