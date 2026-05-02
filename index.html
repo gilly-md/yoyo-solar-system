@@ -1038,6 +1038,7 @@ let unsubscribeRoom = null;
 let qTimerInterval = null;
 let revealCountdownInterval = null;
 let lastQuestionIndex = -1;
+let lastAutoAdvanceForQuestion = -1;
 let lastState = null;
 let myAnswerSubmitted = false;
 
@@ -1263,7 +1264,7 @@ function cleanupAndExit(msg) {
   if (unsubscribeRoom) { unsubscribeRoom(); unsubscribeRoom = null; }
   if (qTimerInterval) { clearInterval(qTimerInterval); qTimerInterval = null; }
   if (revealCountdownInterval) { clearInterval(revealCountdownInterval); revealCountdownInterval = null; }
-  roomData = null; roomCode = null; isHost = false; lastState = null; lastQuestionIndex = -1;
+  roomData = null; roomCode = null; isHost = false; lastState = null; lastQuestionIndex = -1; lastAutoAdvanceForQuestion = -1;
   window.history.replaceState(null, '', window.location.pathname);
   if (msg) setTimeout(() => alert(msg), 100);
   showScreen('start');
@@ -1446,7 +1447,31 @@ function renderQuestion() {
   const players = roomData.players || {};
   const playerCount = Object.keys(players).length;
   const answeredCount = Object.values(players).filter(p => p.answeredCurrent).length;
-  $('qAnsweredCount').textContent = `${answeredCount}/${playerCount} ענו`;
+  const allAnswered = answeredCount === playerCount && playerCount > 0;
+
+  const countEl = $('qAnsweredCount');
+  if (allAnswered) {
+    countEl.textContent = `כולם ענו! 🎉`;
+    countEl.style.color = 'var(--success-green)';
+    countEl.style.fontWeight = '700';
+  } else {
+    countEl.textContent = `${answeredCount}/${playerCount} ענו`;
+    countEl.style.color = '';
+    countEl.style.fontWeight = '';
+  }
+
+  // Auto-advance when all players answered (host only, once per question)
+  if (allAnswered &&
+      isHost &&
+      roomData.state === 'question' &&
+      lastAutoAdvanceForQuestion !== qIdx) {
+    lastAutoAdvanceForQuestion = qIdx;
+    setTimeout(() => {
+      if (roomData && roomData.state === 'question') {
+        advanceToReveal();
+      }
+    }, 800);
+  }
 
   // Build options if not built or question changed
   const optionsEl = $('qOptions');
