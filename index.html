@@ -644,6 +644,105 @@
 
   /* Final leaderboard */
   .final-emoji { font-size: 4.5rem; text-align: center; margin: 8px 0; animation: bounce 1s ease infinite alternate; }
+
+  /* Video intro card */
+  .video-card {
+    text-align: center;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(255,62,157,0.15), rgba(0,245,255,0.1));
+    border-color: rgba(255,215,0,0.4);
+    box-shadow: 0 0 40px rgba(255,215,0,0.2), 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .video-suspense {
+    font-family: 'Bellefair', serif;
+    font-size: 1.4rem;
+    color: var(--star-gold);
+    margin-bottom: 14px;
+    animation: suspense 1.5s ease-in-out infinite;
+  }
+  @keyframes suspense {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50% { transform: scale(1.05); opacity: 1; }
+  }
+  .video-wrap {
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+    margin-bottom: 12px;
+    border: 2px solid rgba(255,215,0,0.3);
+  }
+  .video-wrap video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 70vh;
+  }
+  .btn-skip-video {
+    background: transparent;
+    color: var(--soft-purple);
+    border: 1px solid rgba(183,148,244,0.4);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .btn-skip-video:active { transform: scale(0.95); background: rgba(183,148,244,0.15); }
+
+  /* Winner reveal card - the big dramatic announcement */
+  .winner-reveal-card {
+    text-align: center;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,62,157,0.15));
+    border: 2px solid var(--star-gold);
+    box-shadow: 0 0 60px rgba(255,215,0,0.4), 0 12px 40px rgba(0,0,0,0.5);
+    animation: winnerReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes winnerReveal {
+    0% { opacity: 0; transform: scale(0.5) rotate(-5deg); }
+    60% { opacity: 1; transform: scale(1.05) rotate(2deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  .winner-prefix {
+    font-size: 1rem;
+    color: var(--star-gold);
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+  .winner-name-big {
+    font-family: 'Bellefair', serif;
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, var(--star-gold) 50%, var(--plasma-pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 40px rgba(255,215,0,0.5);
+    animation: winnerNamePulse 2s ease-in-out infinite;
+  }
+  @keyframes winnerNamePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+  .winner-score-big {
+    font-size: 1.1rem;
+    color: var(--ghost-white);
+  }
+  .winner-score-big span {
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: var(--star-gold);
+  }
+
+  @media (min-width: 600px) {
+    .winner-name-big { font-size: 4rem; }
+    .video-suspense { font-size: 1.8rem; }
+  }
   .final-title {
     font-family: 'Bellefair', serif;
     font-size: 2rem;
@@ -922,13 +1021,34 @@
 
   <!-- ===== Finished Screen ===== -->
   <div class="screen" id="screen-finished">
-    <div class="card">
+
+    <!-- Video intro - shown first -->
+    <div class="card video-card" id="videoCard">
+      <div class="video-suspense">🥁 והמנצח/ת הוא/היא...</div>
+      <div class="video-wrap">
+        <video id="winnerVideo" playsinline preload="auto" muted>
+          <source src="winner-video.mp4" type="video/mp4">
+        </video>
+      </div>
+      <button class="btn-skip-video" id="btnSkipVideo">דלגי על הסרטון ←</button>
+    </div>
+
+    <!-- Winner reveal - hidden until video ends -->
+    <div class="card winner-reveal-card" id="winnerRevealCard" style="display:none;">
+      <div class="winner-prefix">🏆 והמנצח/ת הוא/היא 🏆</div>
+      <div class="winner-name-big" id="winnerNameBig">...</div>
+      <div class="winner-score-big"><span id="winnerScoreBig">0</span> נקודות</div>
+    </div>
+
+    <!-- Personal result - hidden until video ends -->
+    <div class="card" id="personalResultCard" style="display:none;">
       <div class="final-emoji" id="fEmoji">🏆</div>
       <h2 class="final-title" id="fTitle">המשחק הסתיים!</h2>
       <p class="final-subtitle" id="fSubtitle">הנה התוצאות הסופיות</p>
     </div>
 
-    <div class="card">
+    <!-- Leaderboard - hidden until video ends -->
+    <div class="card" id="leaderboardFinalCard" style="display:none;">
       <div class="leaderboard-list" id="fLeaderboardList"></div>
       <button class="btn btn-secondary" id="btnPlayAgain">→ חזרה לתפריט הראשי</button>
     </div>
@@ -1561,7 +1681,7 @@ async function submitAnswer(selectedIdx) {
 
   let points = 0;
   if (isCorrect) {
-    points = 100 + Math.round((timeLeft / QUESTION_TIME) * 100);
+    points = 200 + Math.round((timeLeft / QUESTION_TIME) * 30);
   }
 
   const currentScore = roomData.players?.[myId]?.score || 0;
@@ -1720,11 +1840,18 @@ function renderFinished() {
     .sort((a, b) => (b.score || 0) - (a.score || 0));
   const top5 = sorted.slice(0, 5);
   const myRank = sorted.findIndex(p => p.id === myId) + 1;
+  const winner = sorted[0];
 
-  // Title based on rank
+  // === Set up the WINNER REVEAL card (the big dramatic announcement) ===
+  if (winner) {
+    $('winnerNameBig').textContent = winner.name;
+    $('winnerScoreBig').textContent = (winner.score || 0).toLocaleString();
+  }
+
+  // === Set up personal result card (varies by rank) ===
   let emoji, title, subtitle;
   if (myRank === 1) {
-    emoji = '🏆'; title = 'ניצחת!'; subtitle = `המקום הראשון! את אלופת הכיתה 🌟`;
+    emoji = '🏆'; title = 'ניצחת!'; subtitle = 'המקום הראשון! 🌟';
   } else if (myRank === 2) {
     emoji = '🥈'; title = 'מקום שני!'; subtitle = 'תוצאה מצוינת!';
   } else if (myRank === 3) {
@@ -1734,12 +1861,11 @@ function renderFinished() {
   } else {
     emoji = '🚀'; title = 'המשחק הסתיים!'; subtitle = `סיימת במקום ${myRank} מתוך ${sorted.length}`;
   }
-
   $('fEmoji').textContent = emoji;
   $('fTitle').textContent = title;
   $('fSubtitle').textContent = subtitle;
 
-  // Leaderboard
+  // === Set up leaderboard ===
   const medals = ['🥇','🥈','🥉','🏅','🏅'];
   $('fLeaderboardList').innerHTML = top5.map((p, i) => {
     let cls = 'lb-row';
@@ -1759,8 +1885,54 @@ function renderFinished() {
     `;
   }).join('');
 
-  // 🎉 Celebrate based on my rank
-  setTimeout(() => celebrateRank(myRank), 500);
+  // === DRAMATIC FLOW: Show video first, then reveal everything ===
+
+  // Hide winner & leaderboard cards initially
+  $('winnerRevealCard').style.display = 'none';
+  $('personalResultCard').style.display = 'none';
+  $('leaderboardFinalCard').style.display = 'none';
+  $('videoCard').style.display = 'block';
+
+  const video = $('winnerVideo');
+  let revealed = false;
+
+  function revealWinner() {
+    if (revealed) return;
+    revealed = true;
+
+    // Hide video, show all result cards
+    $('videoCard').style.display = 'none';
+    $('winnerRevealCard').style.display = 'block';
+    $('personalResultCard').style.display = 'block';
+    $('leaderboardFinalCard').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Confetti AFTER reveal animation plays
+    setTimeout(() => celebrateRank(myRank), 600);
+  }
+
+  // Play video and listen for end
+  video.currentTime = 0;
+  video.muted = true; // ensures autoplay works on all browsers
+  const playPromise = video.play();
+  if (playPromise) {
+    playPromise.catch(() => {
+      // Autoplay blocked - reveal immediately as fallback
+      revealWinner();
+    });
+  }
+
+  video.onended = revealWinner;
+  video.onerror = revealWinner;
+
+  // Skip button
+  $('btnSkipVideo').onclick = () => {
+    video.pause();
+    revealWinner();
+  };
+
+  // Safety net: reveal after 30 seconds no matter what
+  setTimeout(revealWinner, 30000);
 }
 
 // ===== Victory Animations =====
